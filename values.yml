@@ -1,8 +1,7 @@
-name: redash-prod
-name_fqdn: redash-prod.alt.k8s.rl.lan
-name_old_fqdn: alt-redash-prod.rl.lan
-namespace: analytics 
-configMapName: redash-prod-config
+name: redash
+name_fqdn: <fqdn.ingress>
+namespace: <namespace.name>
+configMapName: redash
 configMapData:
   REDASH_LOG_LEVEL: "INFO"
   REDASH_MAIL_SERVER: "<mail.server>"
