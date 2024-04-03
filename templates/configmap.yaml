@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configMapName }}
+data:
+  REDASH_LOG_LEVEL: {{ .Values.configMapData.REDASH_LOG_LEVEL | quote }}
+  REDASH_REDIS_URL: redis://{{ .Values.redisService.name }}.{{ .Values.namespace }}.svc:{{- range $portIndex, $port := .Values.redisService.ports }}{{- if eq $port.protocol "TCP" }}{{ $port.port }}{{- end }}{{- end }}/0
+  REDASH_MAIL_SERVER: {{ .Values.configMapData.REDASH_MAIL_SERVER | quote }}
+  REDASH_MAIL_DEFAULT_SENDER: {{ .Values.configMapData.REDASH_MAIL_DEFAULT_SENDER | quote }}
+  REDASH_DATE_FORMAT: {{ .Values.configMapData.REDASH_DATE_FORMAT | quote }}
+  REDASH_SCHEDULED_REPORTS_ENABLED: {{ .Values.configMapData.REDASH_SCHEDULED_REPORTS_ENABLED | quote }}
+  REDASH_DATABASE_URL: {{ .Values.configMapData.REDASH_DATABASE_URL | quote }}
+  REDASH_LDAP_LOGIN_ENABLED: {{ .Values.configMapData.REDASH_LDAP_LOGIN_ENABLED | quote }}
+  REDASH_LDAP_URL: {{ .Values.configMapData.REDASH_LDAP_URL | quote }}
+  REDASH_LDAP_BIND_DN: {{ .Values.configMapData.REDASH_LDAP_BIND_DN | quote }}
+  REDASH_LDAP_CUSTOM_USERNAME_PROMPT: {{ .Values.configMapData.REDASH_LDAP_CUSTOM_USERNAME_PROMPT | quote }}
+  REDASH_LDAP_DISPLAY_NAME_KEY: {{ .Values.configMapData.REDASH_LDAP_DISPLAY_NAME_KEY | quote }}
+  REDASH_LDAP_EMAIL_KEY: {{ .Values.configMapData.REDASH_LDAP_EMAIL_KEY | quote }}
+  REDASH_LDAP_SEARCH_TEMPLATE: {{ .Values.configMapData.REDASH_LDAP_SEARCH_TEMPLATE | quote }}
+  REDASH_LDAP_SEARCH_DN: {{ .Values.configMapData.REDASH_LDAP_SEARCH_DN | quote }}
+  REDASH_ENFORCE_CSRF: {{ .Values.configMapData.REDASH_ENFORCE_CSRF | quote }}
+  REDASH_GUNICORN_TIMEOUT: {{ .Values.configMapData.REDASH_GUNICORN_TIMEOUT | quote }}
+  REDASH_ADDITIONAL_QUERY_RUNNERS: {{ .Values.configMapData.REDASH_ADDITIONAL_QUERY_RUNNERS | quote }}
+  REDASH_COOKIE_SECRET: {{ .Values.configMapData.REDASH_COOKIE_SECRET | quote }}
+  REDASH_SECRET_KEY: {{ .Values.configMapData.REDASH_SECRET_KEY | quote }}
+  REDASH_LDAP_BIND_DN_PASSWORD: {{ .Values.configMapData.REDASH_LDAP_BIND_DN_PASSWORD | quote }}
+  REDASH_API_KEY: {{ .Values.configMapData.REDASH_API_KEY | quote }}
+  REDASH_HOST: {{ .Values.configMapData.REDASH_HOST | quote }}
+  REDASH_QUERY_RESULTS_CLEANUP_ENABLED: {{ .Values.configMapData.REDASH_QUERY_RESULTS_CLEANUP_ENABLED | quote }}
+  REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE: {{ .Values.configMapData.REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE | quote }}
+  REDASH_QUERY_RESULTS_CLEANUP_COUNT: {{ .Values.configMapData.REDASH_QUERY_RESULTS_CLEANUP_COUNT | quote }}

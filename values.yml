@@ -1,0 +1,194 @@
+name: redash-prod
+name_fqdn: redash-prod.alt.k8s.rl.lan
+name_old_fqdn: alt-redash-prod.rl.lan
+namespace: analytics 
+configMapName: redash-prod-config
+configMapData:
+  REDASH_LOG_LEVEL: "INFO"
+  REDASH_MAIL_SERVER: "<mail.server>"
+  REDASH_MAIL_DEFAULT_SENDER: "<mail.default.sender>"
+  REDASH_DATE_FORMAT: "YYYY-MM-DD"
+  REDASH_SCHEDULED_REPORTS_ENABLED: "true"
+  REDASH_DATABASE_URL: "<external.postgresql.endpoint>"
+  REDASH_LDAP_LOGIN_ENABLED: "true"
+  REDASH_LDAP_URL: "<ldpa.url>"
+  REDASH_LDAP_BIND_DN: "<ldap.bind.dn>"
+  REDASH_LDAP_CUSTOM_USERNAME_PROMPT: "<ldap.custom.username.prompt>"
+  REDASH_LDAP_DISPLAY_NAME_KEY: "<ldap.display.name>"
+  REDASH_LDAP_EMAIL_KEY: "mail"
+  REDASH_LDAP_SEARCH_TEMPLATE: "<ldap.search.template>"
+  REDASH_LDAP_SEARCH_DN: "<ldap.search.dn>"
+  REDASH_ENFORCE_CSRF: "true"
+  REDASH_GUNICORN_TIMEOUT: "60"
+  REDASH_ADDITIONAL_QUERY_RUNNERS: "redash.query_runner.python"
+  REDASH_COOKIE_SECRET: "<redash.cookie.secret>"
+  REDASH_SECRET_KEY: "<redash.secret.key>"
+  REDASH_LDAP_BIND_DN_PASSWORD: "<ldap.bind.dn.password>"
+  REDASH_API_KEY: "<redash.api.key>"
+  REDASH_HOST: "<redash.host>"
+  REDASH_QUERY_RESULTS_CLEANUP_ENABLED: "true"
+  REDASH_QUERY_RESULTS_CLEANUP_COUNT: "500"
+  REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE: "30"
+
+redisService:
+  name: redash-redis-service
+  selector:
+    app: redash-redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+
+redashService:
+  name: redash-server-service
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP
+
+image:
+  repositoryRedash: <custom.build.redash.image.repo>
+  repositoryRedis: redis
+  tagRedash: latest
+  tagRedis: 5.0-alpine 
+
+server:
+  name: redash-server
+  replicas: 1
+  matchLabels:
+    app: redash-server
+  labels:
+    app: redash-server
+    environment: redash
+  containerName: redash-server
+  containerPort: 5000
+  pythonunbuffered: 0
+  redashWebWorkers: 4
+  args: ["server"]
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "2001Mi"
+      cpu: "1000m"
+
+scheduler:
+  name: redash-scheduler
+  replicas: 1
+  matchLabels:
+    app: redash-scheduler
+  labels:
+    app: redash-scheduler
+    environment: redash
+  containerName: redash-scheduler
+  args: ["scheduler"]
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "2001Mi"
+      cpu: "1000m"
+
+scheduledWorker:
+  name: redash-scheduled-worker
+  replicas: 4
+  matchLabels:
+    app: redash-scheduled-worker
+  labels:
+    app: redash-scheduled-worker
+    environment: redash
+  containerName: redash-scheduled-worker
+  args: ["worker"]
+  queues: "scheduled_queries"
+  workersCount: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "2000Mi"
+      cpu: "1000m"
+
+
+adhocWorker:
+  name: redash-adhoc-worker
+  replicas: 8
+  matchLabels:
+    app: redash-adhoc-worker
+  labels:
+    app: redash-adhoc-worker
+    environment: redash
+  containerName: redash-adhoc-worker
+  args: ["worker"]
+  queues: "queries"
+  workerCount: 1
+  pythonunbuffered: 0
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "2000Mi"
+      cpu: "1000m"
+
+
+worker:
+  name: redash-worker
+  replicas: 4
+  matchLabels:
+    app: redash-worker
+  labels:
+    app: redash-worker
+    environment: redash
+  containerName: redash-worker
+  args: ["worker"]
+  queues: "periodic,default"
+  workersCount: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "2001Mi"
+      cpu: "1000m"
+
+worker2:
+  name: redash-worker2
+  replicas: 4
+  matchLabels:
+    app: redash-worker2
+  labels:
+    app: redash-worker2
+    environment: redash
+  containerName: redash-worker2
+  args: ["worker"]
+  queues: "schemas"
+  workersCount: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "2000Mi"
+      cpu: "1000m"
+
+redis:
+  name: redis
+  replicas: 1
+  matchLabels:
+    app: redash-redis
+  labels:
+    app: redash-redis
+    environment: redash
+  containerName: redis
+  containerPort: 6379
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "50m"
+    limits:
+      memory: "1001Mi"
+      cpu: "1000m"

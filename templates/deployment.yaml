@@ -1,0 +1,234 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.server.name }}
+spec:
+  replicas: {{ .Values.server.replicas }}
+  selector:
+    matchLabels:
+      {{ toYaml .Values.server.matchLabels | nindent 8 }}
+  template:
+    metadata:
+      labels:
+        {{ toYaml .Values.server.labels | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.server.containerName }}
+          image: {{ .Values.image.repositoryRedash }}:{{ .Values.image.tagRedash }}
+          args: {{ .Values.server.args | toJson }}
+          ports:
+            - containerPort: {{ .Values.server.containerPort }}
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "{{ .Values.server.pythonunbuffered }}"
+            - name: REDASH_WEB_WORKERS
+              value: "{{ .Values.server.redashWebWorkers }}"
+          resources:
+            requests:
+              memory: {{ .Values.server.resources.requests.memory }}
+              cpu: {{ .Values.server.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.server.resources.limits.memory }}
+              cpu: {{ .Values.server.resources.limits.cpu }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMapName }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.scheduler.name }}
+spec:
+  replicas: {{ .Values.scheduler.replicas }}
+  selector:
+    matchLabels:
+      {{ toYaml .Values.scheduler.matchLabels | nindent 8 }}
+  template:
+    metadata:
+      labels:
+        {{ toYaml .Values.scheduler.labels | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.scheduler.containerName }}
+          image: {{ .Values.image.repositoryRedash }}:{{ .Values.image.tagRedash }}
+          args: {{ .Values.scheduler.args | toJson }}
+          resources:
+            requests:
+              memory: {{ .Values.scheduler.resources.requests.memory }}
+              cpu: {{ .Values.scheduler.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.scheduler.resources.limits.memory }}
+              cpu: {{ .Values.scheduler.resources.limits.cpu }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMapName }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.scheduledWorker.name }}
+spec:
+  replicas: {{ .Values.scheduledWorker.replicas }}
+  selector:
+    matchLabels:
+      {{ toYaml .Values.scheduledWorker.matchLabels | nindent 8 }}
+  template:
+    metadata:
+      labels:
+        {{ toYaml .Values.scheduledWorker.labels | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.scheduledWorker.containerName }}
+          image: {{ .Values.image.repositoryRedash }}:{{ .Values.image.tagRedash }}
+          args: {{ .Values.scheduledWorker.args | toJson }}
+          env:
+            - name: QUEUES
+              value: "{{ .Values.scheduledWorker.queues }}"
+            - name: WORKERS_COUNT
+              value: "{{ .Values.scheduledWorker.workersCount }}"
+          resources:
+            requests:
+              memory: {{ .Values.scheduledWorker.resources.requests.memory }}
+              cpu: {{ .Values.scheduledWorker.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.scheduledWorker.resources.limits.memory }}
+              cpu: {{ .Values.scheduledWorker.resources.limits.cpu }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMapName }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.adhocWorker.name }}
+spec:
+  replicas: {{ .Values.adhocWorker.replicas }}
+  selector:
+    matchLabels:
+      {{ toYaml .Values.adhocWorker.matchLabels | nindent 8 }}
+  template:
+    metadata:
+      labels:
+        {{ toYaml .Values.adhocWorker.labels | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.adhocWorker.containerName }}
+          image: {{ .Values.image.repositoryRedash }}:{{ .Values.image.tagRedash }}
+          args: {{ .Values.adhocWorker.args | toJson }}
+          env:
+            - name: QUEUES
+              value: "{{ .Values.adhocWorker.queues }}"
+            - name: WORKER_COUNT
+              value: "{{ .Values.adhocWorker.workerCount }}"
+            - name: PYTHONUNBUFFERED
+              value: "{{ .Values.adhocWorker.pythonunbuffered }}"
+          resources:
+            requests:
+              memory: {{ .Values.adhocWorker.resources.requests.memory }}
+              cpu: {{ .Values.adhocWorker.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.adhocWorker.resources.limits.memory }}
+              cpu: {{ .Values.adhocWorker.resources.limits.cpu }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMapName }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.worker.name }}
+spec:
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+      {{ toYaml .Values.worker.matchLabels | nindent 8 }}
+  template:
+    metadata:
+      labels:
+        {{ toYaml .Values.worker.labels | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.worker.containerName }}
+          image: {{ .Values.image.repositoryRedash }}:{{ .Values.image.tagRedash }}
+          args: {{ .Values.worker.args | toJson }}
+          env:
+            - name: QUEUES
+              value: "{{ .Values.worker.queues }}"
+            - name: WORKERS_COUNT
+              value: "{{ .Values.worker.workersCount }}"
+          resources:
+            requests:
+              memory: {{ .Values.worker.resources.requests.memory }}
+              cpu: {{ .Values.worker.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.worker.resources.limits.memory }}
+              cpu: {{ .Values.worker.resources.limits.cpu }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMapName }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.worker2.name }}
+spec:
+  replicas: {{ .Values.worker2.replicas }}
+  selector:
+    matchLabels:
+      {{ toYaml .Values.worker2.matchLabels | nindent 8 }}
+  template:
+    metadata:
+      labels:
+        {{ toYaml .Values.worker2.labels | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.worker2.containerName }}
+          image: {{ .Values.image.repositoryRedash }}:{{ .Values.image.tagRedash }}
+          args: {{ .Values.worker2.args | toJson }}
+          env: 
+            - name: QUEUES
+              value: "{{ .Values.worker2.queues }}"
+            - name: WORKERS_COUNT
+              value: "{{ .Values.worker2.workersCount }}"
+          resources:
+            requests:
+              memory: {{ .Values.worker2.resources.requests.memory }}
+              cpu: {{ .Values.worker2.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.worker2.resources.limits.memory }}
+              cpu: {{ .Values.worker2.resources.limits.cpu }}
+          envFrom: 
+            - configMapRef:
+                name: {{ .Values.configMapName }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.redis.name }}
+spec:
+  replicas: {{ .Values.redis.replicas }}
+  selector:
+    matchLabels:
+      {{ toYaml .Values.redis.matchLabels | nindent 8 }}
+  template:
+    metadata:
+      labels:
+        {{ toYaml .Values.redis.labels | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.redis.containerName }}
+          image: {{ .Values.image.repositoryRedis }}:{{ .Values.image.tagRedis }}
+          ports:
+            - containerPort: {{ .Values.redis.containerPort }}
+          resources:
+            requests:
+              memory: {{ .Values.redis.resources.requests.memory }}
+              cpu: {{ .Values.redis.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.redis.resources.limits.memory }}
+              cpu: {{ .Values.redis.resources.limits.cpu }}
+          readinessProbe: 
+            tcpSocket:
+              port: {{ .Values.redis.containerPort }}
+            initialDelaySeconds: 5 
+            periodSeconds: 10    

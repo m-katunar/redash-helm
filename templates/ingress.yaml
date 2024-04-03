@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  name: {{ .Values.name }}-ingress
+spec:
+  rules:
+  - host: "{{ .Values.name_fqdn }}"
+    http: 
+      paths:
+      - backend:
+          service:
+            name: {{ .Values.redashService.name }}
+            port:
+              number: 5000
+        path: /
+        pathType: Prefix
+  - host: "{{ .Values.name_old_fqdn }}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Values.redashService.name }}
+            port:
+              number: 5000
+        path: /
+        pathType: Prefix
+  tls:
+    - hosts:
+        - {{ .Values.name_fqdn }}
+        - {{ .Values.name_old_fqdn }}
+      secretName: {{ .Values.name }}.tls

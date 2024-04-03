@@ -1,0 +1,23 @@
+kind: Certificate
+apiVersion: cert-manager.io/v1
+metadata:
+  name: {{ .Values.name }}-cert
+  namespace: analytics 
+spec:
+  commonName: {{ .Values.name_fqdn }}
+  dnsNames:
+    - {{ .Values.name_fqdn }}
+    - {{ .Values.name_old_fqdn }}
+  duration: 2160h0m0s
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: ca-issuer 
+  renewBefore: 360h0m0s
+  secretName: {{ .Values.name }}.tls
+  usages:
+    - server auth
+    - client auth
+  privateKey:
+    algorithm: "RSA"
+    size: 2048
